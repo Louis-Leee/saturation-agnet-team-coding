@@ -1,19 +1,33 @@
 # Saturated Agent Team Coding (饱和式编程)
 
-A Claude Code skill that applies **ensemble methods to software engineering** — spawning 3 independent coding agents to implement the same requirement in parallel, then selecting and merging the best code through an architect review.
+A Claude Code skill that applies **ensemble methods to the FULL software lifecycle** — from planning to implementation to review. Multi-agent redundancy at every stage ensures the best outcome.
 
-## How It Works
+## Two Sub-Workflows
+
+### `write-plans` — Saturated Planning
+Dispatch 2-3 planning agents in parallel (using `superpowers:writing-plans` + `everything-claude-code:plan` methodologies). Each independently generates a complete implementation plan. The orchestrator reviews, scores, and merges them into one superior plan.
+
+### `execute-plans` — Saturated Execution
+Dispatch 3 coding agents in isolated git worktrees, each independently implementing with TDD. A senior architect scores all 3 on a 100-point rubric, merges the best, then runs a cross-review gauntlet (auto-codex + security + code quality) before shipping.
+
+## Full Pipeline
 
 ```
-Phase 0: Setup        → Create 3 git worktrees + documentation structure
-Phase 1: Parallel     → 3 agents independently implement with TDD (RED-GREEN-REFACTOR)
-Phase 2: Architect    → Senior architect scores all 3 on a 100-point rubric
-Phase 3: Merge+Verify → Merge winner, full TDD verification, 80%+ coverage
-Phase 4: Auto-Review  → Auto-codex-review loop until clean
-Phase 5: Ship         → Document, commit, push, clean up worktrees
+User requirement
+    ↓
+[write-plans] → 2+ agents generate plans in parallel
+    ↓              → Orchestrator reviews & merges → Final plan
+    ↓
+[execute-plans] → 3 agents implement in parallel (TDD)
+    ↓               → Architect scores & merges best code
+    ↓               → TDD verification on merged code
+    ↓               → Auto-codex + security + code quality reviews
+    ↓               → Documentation + git push
+    ↓
+Shipped!
 ```
 
-### Scoring Rubric (100 points)
+## Scoring Rubric (100 points)
 
 | Criterion | Weight | Focus |
 |-----------|--------|-------|
@@ -26,125 +40,69 @@ Phase 5: Ship         → Document, commit, push, clean up worktrees
 
 ## Installation
 
-### One-liner (recommended)
+### One-liner
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/Louis-Leee/saturation-agnet-team-coding/master/install.sh)
 ```
 
-### Manual Installation
+### Manual
 
 ```bash
-# Clone the repo
 git clone git@github.com:Louis-Leee/saturation-agnet-team-coding.git /tmp/sat-skill
-
-# Copy skill files to Claude Code skills directory
 mkdir -p ~/.claude/skills/saturated-agent-team-coding
 cp /tmp/sat-skill/skills/saturated-agent-team-coding/* ~/.claude/skills/saturated-agent-team-coding/
-
-# Clean up
 rm -rf /tmp/sat-skill
-```
-
-### Verify Installation
-
-```bash
-ls ~/.claude/skills/saturated-agent-team-coding/
-# Should show: SKILL.md  agent-prompt-template.md  architect-review-template.md  merge-strategy.md
 ```
 
 ## Usage
 
-### In Claude Code
-
 ```
-# Direct invocation
+# Full pipeline (plan → execute)
 /saturated-agent-team-coding
 
-# Or just describe your task with keywords:
-"Use agent team to implement the retry mechanism"
-"饱和式编程: add a caching layer"
-"Use best-of-3 parallel agents to build the API"
+# Planning only
+"saturated plan for feature X" or "饱和式 plan"
+
+# Execution only (plan already exists)
+"execute with agent team" or "饱和式执行"
 ```
-
-### Auto-trigger Keywords
-
-The skill auto-activates when you mention:
-- `agent team`
-- `saturation coding` / `饱和式编程`
-- `parallel agents`
-- `best-of-3`
 
 ## File Structure
 
 ```
 skills/saturated-agent-team-coding/
-├── SKILL.md                      # Main reference (541 lines)
-│                                  # - 6-phase workflow with flowcharts
-│                                  # - Scoring rubric details
-│                                  # - Quality gates and red flags
-│                                  # - Integration with other skills
-│
+├── SKILL.md                      # Main entry + router (write-plans vs execute-plans)
+├── write-plans.md                # Saturated planning workflow
+│                                  # - 2-3 parallel planning agents
+│                                  # - Plan scoring rubric & comparison
+│                                  # - Merge strategy + review loop
+├── execute-plans.md              # Saturated execution workflow (7 phases)
+│                                  # - 3 parallel coding agents in worktrees
+│                                  # - Spec compliance review per agent
+│                                  # - Architect scoring + merge
+│                                  # - Cross-review gauntlet (codex + security + quality)
 ├── agent-prompt-template.md       # Template for coding agent dispatch
-│                                  # - TDD requirements
-│                                  # - Documentation format
-│                                  # - Self-assessment criteria
-│
-├── architect-review-template.md   # Architect scoring rubric
-│                                  # - Per-criterion scoring guide
-│                                  # - Selection decision matrix
-│                                  # - Review document template
-│
-└── merge-strategy.md              # Merge decision matrix
-                                   # - Clear winner vs close race
-                                   # - Hybrid merge (rare)
-                                   # - Post-merge verification
-```
-
-## Documentation Output
-
-Each run creates persistent documentation in `claude_docs/`:
-
-```
-claude_docs/saturation-run-YYYY-MM-DD-HHMM/
-├── requirements.md              # What was requested
-├── progress.md                  # Final summary with scores
-├── agent-alpha/implementation.md  # Alpha's approach + TDD log
-├── agent-beta/implementation.md   # Beta's approach + TDD log
-├── agent-gamma/implementation.md  # Gamma's approach + TDD log
-├── architect-review.md          # Comparative analysis + decision
-└── final-review.md              # Auto-codex review results
+├── architect-review-template.md   # 100-point scoring rubric for architect
+└── merge-strategy.md              # Decision matrix for selecting winners
 ```
 
 ## Dependencies (Sub-skills)
 
 **Required:**
-- `superpowers:test-driven-development` — TDD for each coding agent
-- `superpowers:using-git-worktrees` — Worktree setup
-- `auto-codex-review` — Final quality gate
+- `superpowers:test-driven-development`
+- `superpowers:writing-plans`
+- `superpowers:using-git-worktrees`
+- `superpowers:verification-before-completion`
+- `auto-codex-review`
 
-**Recommended:**
-- `superpowers:dispatching-parallel-agents` — Parallel dispatch patterns
-- `superpowers:subagent-driven-development` — Subagent management
-- `superpowers:verification-before-completion` — Final verification
-
-## Customization
-
-### Agent Count
-```
-Default: 3 agents (good diversity-to-cost ratio)
-Minimum: 2 agents (still provides comparison)
-Maximum: 5 agents (diminishing returns beyond this)
-```
-
-### Scoring Weights
-Adjust in SKILL.md based on project priorities:
-- Performance-critical → increase Performance weight
-- Security-critical → increase Security weight
+**Used by planning agents:**
+- `everything-claude-code:plan`
+- `everything-claude-code:multi-plan` (if available)
 
 ## Inspired By
 
-- [ChatDev](https://github.com/OpenBMB/ChatDev) — Role-based multi-agent software development
+- [ChatDev](https://github.com/OpenBMB/ChatDev) — Role-based multi-agent development
 - [MetaGPT](https://github.com/geekan/MetaGPT) — SOPs for agent collaboration
 - Ensemble code generation (best-of-N sampling)
 - Tournament selection from genetic algorithms
