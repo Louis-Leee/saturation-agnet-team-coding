@@ -1,3 +1,9 @@
+---
+name: write-plans
+description: "Saturated planning: dispatch 2-3 parallel planning agents, each independently generates a complete implementation plan, then orchestrator reviews, compares, and merges into a superior final plan. Trigger on: 'saturated plan', '饱和式 plan', 'multi-agent plan'."
+user-invocable: true
+---
+
 # Saturated Planning (write-plans)
 
 ## Overview

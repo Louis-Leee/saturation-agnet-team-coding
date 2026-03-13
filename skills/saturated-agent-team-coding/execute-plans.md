@@ -1,3 +1,9 @@
+---
+name: execute-plans
+description: "Saturated execution: dispatch 3 parallel coding agents in isolated git worktrees, each independently implements with TDD. Senior architect scores all 3, merges the best, then cross-review validates before shipping. Trigger on: 'execute with agent team', '饱和式执行', 'best-of-3 implement'."
+user-invocable: true
+---
+
 # Saturated Execution (execute-plans)
 
 ## Overview

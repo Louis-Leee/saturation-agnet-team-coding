@@ -69,11 +69,11 @@ Shipped!
 # Full pipeline (plan then execute)
 /saturated-agent-team-coding
 
-# Plan only
-Say: "saturated plan for feature X" or "饱和式 plan"
+# Plan only (directly invocable sub-skill)
+/saturated-agent-team-coding:write-plans
 
-# Execute only (when plan already exists)
-Say: "execute this plan with agent team" or "饱和式执行"
+# Execute only (directly invocable sub-skill, when plan already exists)
+/saturated-agent-team-coding:execute-plans
 ```
 
 ## Documentation Convention
