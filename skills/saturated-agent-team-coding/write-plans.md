@@ -1,6 +1,6 @@
 ---
 name: write-plans
-description: "Saturated planning: dispatch 2-3 parallel planning agents, each independently generates a complete implementation plan, then orchestrator reviews, compares, and merges into a superior final plan. Trigger on: 'saturated plan', '饱和式 plan', 'multi-agent plan'."
+description: "Saturated planning: dispatch 3 parallel planning agents with health monitoring, each independently generates a complete plan, then orchestrator reviews, compares, and merges. Trigger on: 'saturated plan', '饱和式 plan', 'multi-agent plan'."
 user-invocable: true
 ---
 
@@ -10,7 +10,7 @@ user-invocable: true
 
 **Multiple agents write plans in parallel, then the orchestrator reviews and merges into one superior plan.**
 
-Instead of relying on a single planning pass, dispatch 2+ independent planning agents — each using different planning skills/approaches — then act as the Senior Reviewer to select and synthesize the best elements.
+Instead of relying on a single planning pass, dispatch **exactly 3** independent planning agents — each using different planning skills/approaches — then act as the Senior Reviewer to select and synthesize the best elements. Includes health monitoring, timeout recovery, and replacement dispatch to guarantee reliable completion.
 
 ## When to Use
 
@@ -28,17 +28,25 @@ digraph write_plans {
 
     "Parse user requirements" -> "Gather codebase context";
     "Gather codebase context" -> "Write shared context doc";
-    "Write shared context doc" -> "Dispatch Plan Agent A";
-    "Write shared context doc" -> "Dispatch Plan Agent B";
-    "Write shared context doc" -> "Dispatch Plan Agent C (optional)";
+    "Write shared context doc" -> "Dispatch 3 Plan Agents (parallel)";
 
-    "Dispatch Plan Agent A" [style=filled, fillcolor="#ffcccc", label="Plan Agent A\n(superpowers:writing-plans)"];
-    "Dispatch Plan Agent B" [style=filled, fillcolor="#ccffcc", label="Plan Agent B\n(everything-claude-code:plan)"];
-    "Dispatch Plan Agent C (optional)" [style=filled, fillcolor="#ccccff", label="Plan Agent C (optional)\n(custom/multi-plan)"];
+    "Plan Agent A\n(superpowers:writing-plans)" [style=filled, fillcolor="#ffcccc"];
+    "Plan Agent B\n(everything-claude-code:plan)" [style=filled, fillcolor="#ccffcc"];
+    "Plan Agent C\n(multi-perspective)" [style=filled, fillcolor="#ccccff"];
 
-    "Dispatch Plan Agent A" -> "Orchestrator Reviews All Plans";
-    "Dispatch Plan Agent B" -> "Orchestrator Reviews All Plans";
-    "Dispatch Plan Agent C (optional)" -> "Orchestrator Reviews All Plans";
+    "Dispatch 3 Plan Agents (parallel)" -> "Plan Agent A\n(superpowers:writing-plans)";
+    "Dispatch 3 Plan Agents (parallel)" -> "Plan Agent B\n(everything-claude-code:plan)";
+    "Dispatch 3 Plan Agents (parallel)" -> "Plan Agent C\n(multi-perspective)";
+
+    "Plan Agent A\n(superpowers:writing-plans)" -> "Health Check & Recovery";
+    "Plan Agent B\n(everything-claude-code:plan)" -> "Health Check & Recovery";
+    "Plan Agent C\n(multi-perspective)" -> "Health Check & Recovery";
+
+    "Health Check & Recovery" [style=filled, fillcolor="#ffeecc", label="Health Check & Recovery\n(verify outputs, retry failures)"];
+    "Health Check & Recovery" -> ">=2 plans?" [shape=diamond];
+    ">=2 plans?" -> "Orchestrator Reviews All Plans" [label="yes"];
+    ">=2 plans?" -> "Dispatch Replacement Agent" [label="no"];
+    "Dispatch Replacement Agent" -> "Health Check & Recovery";
 
     "Orchestrator Reviews All Plans" [style=filled, fillcolor="#ffffcc"];
     "Orchestrator Reviews All Plans" -> "Score & Compare";
@@ -75,7 +83,9 @@ This context document is shared with ALL planning agents to ensure they plan aga
 
 ## Phase 2: Parallel Plan Generation
 
-### Dispatch 2-3 Planning Agents in Parallel
+### Dispatch Exactly 3 Planning Agents in Parallel (MANDATORY)
+
+**You MUST dispatch all 3 agents.** No shortcuts. No "2 is enough." 3 agents provides the diversity needed for robust plan synthesis.
 
 Each agent uses a DIFFERENT planning skill/approach for maximum diversity:
 
@@ -144,7 +154,7 @@ Agent(
 )
 ```
 
-**Agent C (Optional) — Using multi-model collaborative approach:**
+**Agent C (MANDATORY) — Using multi-perspective analysis approach:**
 ```python
 Agent(
     description="Plan Agent C: multi-model collaborative plan",
@@ -175,6 +185,38 @@ Agent(
     model="opus"
 )
 ```
+
+---
+
+## Phase 2.5: Agent Health Check & Recovery (MANDATORY)
+
+After dispatching all 3 agents, **you MUST verify each agent completed successfully** before proceeding. Agents can silently fail, get stuck, or produce incomplete output.
+
+### Completion Verification Checklist
+
+For EACH agent (A, B, C), verify:
+- [ ] Agent returned a result (did not error/timeout)
+- [ ] Output plan file exists and is non-empty: `claude_docs/saturation-run-{TIMESTAMP}/plan-agent-{x}.md`
+- [ ] Plan contains actual content (not just headers/boilerplate — check word count > 500)
+- [ ] Self-assessment score is present at the end
+
+### Recovery Protocol
+
+| Failure | Action |
+|---------|--------|
+| Agent returned error | Dispatch a **replacement agent** with the same role and approach. Max 1 retry per slot. |
+| Agent output file missing or empty | Same as error — dispatch replacement. |
+| Agent output is incomplete (< 500 words, no self-assessment) | **Resume** the agent if possible (pass agent ID). If not resumable, dispatch replacement. |
+| 2 of 3 agents failed | Dispatch 2 replacements in parallel. This is your last retry round. |
+| All 3 agents failed | **STOP.** Report to user. Do NOT proceed with 0 plans. Investigate root cause (prompt too long? context too complex?). |
+
+### Minimum Viable Results
+
+- **Ideal:** 3 of 3 plans completed → full 3-way comparison
+- **Acceptable:** 2 of 3 plans completed → proceed with 2-way comparison (after 1 retry round for the failed agent)
+- **Unacceptable:** < 2 plans completed → STOP, do not proceed to review
+
+**DO NOT skip this phase.** "All agents seemed to run" is not verification. Read the output files.
 
 ---
 

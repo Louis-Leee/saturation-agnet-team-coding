@@ -126,6 +126,41 @@ Each agent MUST:
 
 ---
 
+## Phase 2.5: Agent Health Check & Recovery (MANDATORY)
+
+After dispatching all 3 coding agents, **you MUST verify each agent completed successfully** before proceeding to review. Agents can silently fail, get stuck, or produce incomplete output.
+
+### Completion Verification Checklist
+
+For EACH agent (Alpha, Beta, Gamma), verify:
+- [ ] Agent returned a result (did not error/timeout)
+- [ ] Agent has git commits on its branch (`git log sat-impl-{name} --oneline` shows work)
+- [ ] Documentation file exists: `claude_docs/saturation-run-{TIMESTAMP}/agent-{name}/implementation.md`
+- [ ] Implementation doc contains TDD log entries (not just empty template)
+- [ ] Self-assessment score (1-10) is present
+- [ ] Tests exist and were run (check for test files in the worktree)
+
+### Recovery Protocol
+
+| Failure | Action |
+|---------|--------|
+| Agent returned error | Dispatch a **replacement agent** in a new worktree branch (`sat-impl-{name}-retry`). Max 1 retry per slot. |
+| Agent has no commits | Same as error — agent didn't produce work. Dispatch replacement. |
+| Agent has commits but no tests | **Resume** the agent (pass agent ID) with instruction: "You MUST write tests. Your work is incomplete." |
+| Agent output is incomplete (no self-assessment, partial TDD log) | **Resume** the agent to finish. If not resumable, dispatch replacement. |
+| 2 of 3 agents failed | Dispatch 2 replacements in parallel. This is your last retry round. |
+| All 3 agents failed | **STOP.** Report to user. Do NOT proceed. Investigate root cause (plan too complex? missing context?). |
+
+### Minimum Viable Results
+
+- **Ideal:** 3 of 3 agents completed → full 3-way comparison
+- **Acceptable:** 2 of 3 agents completed → proceed with 2-way comparison (after 1 retry round for the failed agent)
+- **Unacceptable:** < 2 agents completed → STOP, do not proceed to architect review
+
+**DO NOT skip this phase.** "All agents seemed to run" is not verification. Check the branches and output files.
+
+---
+
 ## Phase 3: Spec Compliance Review (Per Agent)
 
 After each agent completes, dispatch a **Spec Reviewer** for each:
