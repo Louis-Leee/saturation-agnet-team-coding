@@ -14,9 +14,9 @@ All agents use **opus model only**. No model downgrades. Don't be stingy with to
 
 ## When to Use
 
-- Implementation plan exists (from `/saturated-coding:write-plan` or user-provided)
+- Implementation plan exists (from `/saturated-write-plan` or user-provided)
 - User says "execute with agent team", "饱和式执行", "saturated execute"
-- After `/saturated-coding:write-plan` prompts
+- After `/saturated-write-plan` prompts
 
 ## The 7-Phase Process
 
@@ -369,7 +369,7 @@ Merged to sat-integration branch.
 All tests pass. Coverage: {X}%.
 
 Proceeding to cross-verification...
-→ /saturated-coding:verification
+-> /saturated-verify
 ```
 
 The orchestrator automatically proceeds to the verification phase.

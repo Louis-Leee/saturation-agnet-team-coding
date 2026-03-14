@@ -36,19 +36,19 @@ Shipped!
 
 | Phase | Command | Agents | Skills Used | Orchestrator Role |
 |-------|---------|--------|-------------|-------------------|
-| 1. Research | `/saturated-coding:research` | 4 parallel | `superpowers:brainstorming` (inherited) | Spawn + Summarize |
-| 2. Plan | `/saturated-coding:write-plan` | 4 parallel | 2x `superpowers:writing-plans` + 2x ECC multi-plan | Validate + Merge |
-| 3. Execute | `/saturated-coding:execute-plan` | 4 parallel | 2x `superpowers:executing-plans` + 2x `everything-claude-code:tdd` | Wave + Track |
-| 4. Verify | `/saturated-coding:verification` | 2 parallel | `everything-claude-code:code-review` + `auto-codex-review` | Present + Route |
+| 1. Research | `/saturated-research` | 4 parallel | `superpowers:brainstorming` (inherited) | Spawn + Summarize |
+| 2. Plan | `/saturated-write-plan` | 4 parallel | 2x `superpowers:writing-plans` + 2x ECC multi-plan | Validate + Merge |
+| 3. Execute | `/saturated-execute-plan` | 4 parallel | 2x `superpowers:executing-plans` + 2x `everything-claude-code:tdd` | Wave + Track |
+| 4. Verify | `/saturated-verify` | 2 parallel | `everything-claude-code:code-review` + `auto-codex-review` | Present + Route |
 
 ## Routing
 
 | User Intent | Route To |
 |-------------|----------|
-| New idea / need brainstorm | `/saturated-coding:research` |
-| Requirements exist, need plan | `/saturated-coding:write-plan` |
-| Plan exists, need implementation | `/saturated-coding:execute-plan` |
-| Code exists, need review | `/saturated-coding:verification` |
+| New idea / need brainstorm | `/saturated-research` |
+| Requirements exist, need plan | `/saturated-write-plan` |
+| Plan exists, need implementation | `/saturated-execute-plan` |
+| Code exists, need review | `/saturated-verify` |
 | Full pipeline | `/saturated-coding` (starts from research) |
 
 ## Invocation
@@ -57,11 +57,11 @@ Shipped!
 # Full pipeline (starts from research)
 /saturated-coding
 
-# Individual phases
-/saturated-coding:research
-/saturated-coding:write-plan
-/saturated-coding:execute-plan
-/saturated-coding:verification
+# Individual phases (each is an independent skill)
+/saturated-research
+/saturated-write-plan
+/saturated-execute-plan
+/saturated-verify
 ```
 
 ## Orchestrator Rules (NON-NEGOTIABLE)

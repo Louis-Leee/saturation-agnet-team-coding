@@ -56,7 +56,7 @@ digraph research {
     "Orchestrator Synthesizes" [style=filled, fillcolor="#e0e0ff"];
     "Orchestrator Synthesizes" -> "Present to User";
     "Present to User" -> "User Approves?";
-    "User Approves?" -> "Handoff to write-plan" [label="yes"];
+    "User Approves?" -> "Handoff to /saturated-write-plan" [label="yes"];
     "User Approves?" -> "Iterate" [label="adjust"];
     "Iterate" -> "Orchestrator Synthesizes";
 }
@@ -289,5 +289,5 @@ When user approves:
 
 ```
 Research complete. Ready to create implementation plans with 4 parallel planning agents?
-→ /saturated-coding:write-plan
+-> /saturated-write-plan
 ```

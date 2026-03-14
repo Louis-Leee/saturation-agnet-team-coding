@@ -14,7 +14,7 @@ The orchestrator NEVER fixes code itself. It spawns reviewers, waits, integrates
 
 ## When to Use
 
-- After `/saturated-coding:execute-plan` completes
+- After `/saturated-execute-plan` completes
 - Code exists and needs quality assurance
 - User says "saturated verify", "饱和式验证", "cross-verify"
 - Before shipping / git push

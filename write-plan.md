@@ -20,7 +20,7 @@ Each agent independently generates a complete implementation plan. A checker ver
 - Requirements/spec exist but no implementation plan yet
 - Complex feature needing thorough planning
 - User says "saturated plan", "饱和式 plan", "write-plan"
-- After `/saturated-coding:research` completes
+- After `/saturated-research` completes
 
 ## The Process
 
@@ -381,7 +381,7 @@ Format:
 ```markdown
 # {Feature Name} Implementation Plan
 
-> **For agentic workers:** Use /saturated-coding:execute-plan to implement this plan.
+> **For agentic workers:** Use /saturated-execute-plan to implement this plan.
 > Generated via saturated planning (best-of-4 agents, 2 methodologies).
 
 **Goal:** {One sentence}
@@ -468,7 +468,7 @@ Sources:
 - Plan review: APPROVED
 
 Ready to execute with 4 parallel coding agents?
-→ /saturated-coding:execute-plan
+-> /saturated-execute-plan
 ```
 
 ---
